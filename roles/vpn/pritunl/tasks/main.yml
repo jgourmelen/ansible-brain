@@ -1,8 +1,40 @@
-- name: Add Some repo
+- name: Add MongoDB Repository
   yum_repository:
-    name: MongoDB Repository
+    name: mongo.repo
     description: MongoDB Repository
-    baseurl: https://repo.mongodb.org/yum/redhat/7/mongodb-org/4.4/x86_64/
-    gpgkey: https://www.mongodb.org/static/pgp/server-4.4.asc
+    baseurl: https://repo.mongodb.org/yum/redhat/8/mongodb-org/5.0/x86_64/
+    gpgkey: https://www.mongodb.org/static/pgp/server-5.0.asc
     gpgcheck: yes
+
+- name: Add Pritunl Repository
+  yum_repository:
+    name: pritunl.repo
+    description: Pritunl Repository
+    baseurl: https://repo.pritunl.com/stable/yum/centos/8/
+    gpgcheck: yes
+
+- name: Run expect to wait for a successful PXE boot via out-of-band CIMC
+  ansible.builtin.shell: |
+    gpg --keyserver hkp://keyserver.ubuntu.com --recv-keys 7568D9BB55FF9E5287D586017AE645C0CF8E292A
+    gpg --armor --export 7568D9BB55FF9E5287D586017AE645C0CF8E292A > key.tmp; sudo rpm --import key.tmp; rm -f key.tmp
+  become: yes
+
+- name: Install Pritunl / Mongo
+  yum:
+    name:
+      - mongodb-org-server
+      - pritunl
+    state: present
+
+- name: Enable mongod
+  ansible.builtin.systemd:
+    name: mongod
+    state: started
+    enabled: yes
+
+- name: Enable pritunl
+  ansible.builtin.systemd:
+    name: pritunl
+    state: started
+    enabled: yes
 
