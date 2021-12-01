@@ -1,0 +1,11 @@
+
+---
+
+- name: Register as user with password and auto-subscribe to available content.
+  become: true
+  community.general.redhat_subscription:
+    state: present
+    username: "{{ rhn_username }}"
+    password: "{{ rhn_password }}"
+    auto_attach: true
+
