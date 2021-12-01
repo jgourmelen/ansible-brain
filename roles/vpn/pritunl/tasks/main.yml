@@ -13,11 +13,22 @@
     baseurl: https://repo.pritunl.com/stable/yum/centos/8/
     gpgcheck: yes
 
-- name: Run expect to wait for a successful PXE boot via out-of-band CIMC
+- name: Add Pritunl VPN GPG keys
   ansible.builtin.shell: |
     gpg --keyserver hkp://keyserver.ubuntu.com --recv-keys 7568D9BB55FF9E5287D586017AE645C0CF8E292A
     gpg --armor --export 7568D9BB55FF9E5287D586017AE645C0CF8E292A > key.tmp; sudo rpm --import key.tmp; rm -f key.tmp
   become: yes
+
+- name: Disabled firewalld
+  ansible.builtin.systemd:
+    name: firewalld
+    state: stopped
+    enabled: no
+
+- name: Remove the iptables-services
+  yum:
+    name: iptables-services
+    state: absent
 
 - name: Install Pritunl / Mongo
   yum:
@@ -25,6 +36,12 @@
       - mongodb-org-server
       - pritunl
     state: present
+
+- name: Enable pritunl
+  ansible.builtin.systemd:
+    name: pritunl
+    state: started
+    enabled: yes
 
 - name: Enable mongod
   ansible.builtin.systemd:
