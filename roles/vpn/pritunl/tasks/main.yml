@@ -1,16 +1,23 @@
+#- name: Ensure epel repo present
+#  yum:
+#    name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+#    state: present
+#  become: true
+
+
 - name: Add MongoDB Repository
   yum_repository:
     name: mongo.repo
     description: MongoDB Repository
-    baseurl: https://repo.mongodb.org/yum/redhat/8/mongodb-org/5.0/x86_64/
-    gpgkey: https://www.mongodb.org/static/pgp/server-5.0.asc
+    baseurl: https://repo.mongodb.org/yum/redhat/7/mongodb-org/4.4/x86_64/
+    gpgkey: https://www.mongodb.org/static/pgp/server-4.4.asc
     gpgcheck: yes
 
 - name: Add Pritunl Repository
   yum_repository:
     name: pritunl.repo
     description: Pritunl Repository
-    baseurl: https://repo.pritunl.com/stable/yum/centos/8/
+    baseurl: https://repo.pritunl.com/stable/yum/oraclelinux/7/
     gpgcheck: yes
 
 - name: Add Pritunl VPN GPG keys
@@ -19,11 +26,19 @@
     gpg --armor --export 7568D9BB55FF9E5287D586017AE645C0CF8E292A > key.tmp; sudo rpm --import key.tmp; rm -f key.tmp
   become: yes
 
+- name: Ensure epel repo present
+  yum:
+    name: oracle-epel-release-el7
+    state: present
+  become: true
+
+
 - name: Disabled firewalld
   ansible.builtin.systemd:
     name: firewalld
     state: stopped
     enabled: no
+  ignore_errors: yes
 
 - name: Remove the iptables-services
   yum:
