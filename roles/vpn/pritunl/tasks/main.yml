@@ -1,0 +1,8 @@
+- name: Add Some repo
+  yum_repository:
+    name: MongoDB Repository
+    description: MongoDB Repository
+    baseurl: https://repo.mongodb.org/yum/redhat/7/mongodb-org/4.4/x86_64/
+    gpgkey: https://www.mongodb.org/static/pgp/server-4.4.asc
+    gpgcheck: yes
+
